@@ -3,8 +3,10 @@ package com.monopolycapstone.services;
 import com.monopolycapstone.models.User;
 import com.monopolycapstone.repositories.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -29,8 +31,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public List<User> getAllUsers() {
+        return userRepo.findAll();
+    }
+
+    @Override
     public User updateUser(User update) {
-        return userRepo.save(update);
+        if (userRepo.existsById(update.getId())) {
+            return userRepo.save(update);
+        } else {
+            return new User();
+        }
     }
 
     @Override
@@ -38,8 +49,8 @@ public class UserServiceImpl implements UserService {
         try {
             userRepo.deleteById(id);
             return true;
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
+        } catch (EmptyResultDataAccessException e) {
+            System.out.println(e.getMessage());
             return false;
         }
     }
